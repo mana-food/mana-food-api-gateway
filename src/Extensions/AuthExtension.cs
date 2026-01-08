@@ -13,7 +13,6 @@ public static class AuthExtension
     {
         JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear();
 
-        // Bind e valida configurações JWT
         var jwtConfig = configuration.GetSection("Jwt").Get<JwtConfiguration>()
             ?? throw new InvalidOperationException("JWT configuration is missing");
 
@@ -60,32 +59,23 @@ public static class AuthExtension
 
     public static IServiceCollection AddAuthorizationPolicies(this IServiceCollection services)
     {
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy(Policies.ADMIN_ONLY, policy =>
-                policy.RequireRole(Roles.ADMIN));
-
-            options.AddPolicy(Policies.ADMIN_OR_MANAGER, policy =>
-                policy.RequireRole(Roles.ADMIN, Roles.MANAGER));
-
-            options.AddPolicy(Policies.KITCHEN_STAFF, policy =>
-                policy.RequireRole(Roles.KITCHEN, Roles.ADMIN, Roles.MANAGER));
-
-            options.AddPolicy(Policies.OPERATORS, policy =>
-                policy.RequireRole(Roles.OPERATOR, Roles.ADMIN, Roles.MANAGER));
-
-            options.AddPolicy(Policies.MANAGEMENT, policy =>
-                policy.RequireRole(Roles.ADMIN, Roles.MANAGER));
-
-            options.AddPolicy(Policies.AUTHENTICATED_USER, policy =>
-                policy.RequireAuthenticatedUser());
-
-            options.AddPolicy(Policies.ORDER_MANAGEMENT, policy =>
-                policy.RequireRole(Roles.ADMIN, Roles.KITCHEN));
-
-            options.AddPolicy(Policies.DATA_QUERY, policy =>
+        services.AddAuthorizationBuilder()
+            .AddPolicy(Policies.ADMIN_ONLY, policy =>
+                policy.RequireRole(Roles.ADMIN))
+            .AddPolicy(Policies.ADMIN_OR_MANAGER, policy =>
+                policy.RequireRole(Roles.ADMIN, Roles.MANAGER))
+            .AddPolicy(Policies.KITCHEN_STAFF, policy =>
+                policy.RequireRole(Roles.KITCHEN, Roles.ADMIN, Roles.MANAGER))
+            .AddPolicy(Policies.OPERATORS, policy =>
+                policy.RequireRole(Roles.OPERATOR, Roles.ADMIN, Roles.MANAGER))
+            .AddPolicy(Policies.MANAGEMENT, policy =>
+                policy.RequireRole(Roles.ADMIN, Roles.MANAGER))
+            .AddPolicy(Policies.AUTHENTICATED_USER, policy =>
+                policy.RequireAuthenticatedUser())
+            .AddPolicy(Policies.ORDER_MANAGEMENT, policy =>
+                policy.RequireRole(Roles.ADMIN, Roles.KITCHEN))
+            .AddPolicy(Policies.DATA_QUERY, policy =>
                 policy.RequireRole(Roles.ADMIN, Roles.MANAGER, Roles.OPERATOR));
-        });
 
         return services;
     }

@@ -6,6 +6,9 @@ namespace ApiGateway.Extensions;
 
 public static class ReverseProxyExtension
 {
+    private const string UserServiceCluster = "userServiceCluster";
+    private const string AuthCluster = "authCluster";
+
     public static IServiceCollection AddGatewayReverseProxy(this IServiceCollection services, IConfiguration configuration)
     {
         var servicesConfig = configuration.GetSection("Services").Get<ServicesConfiguration>()
@@ -31,7 +34,7 @@ public static class ReverseProxyExtension
             new RouteConfig
             {
                 RouteId = "auth-login",
-                ClusterId = "authCluster",
+                ClusterId = AuthCluster,
                 Match = new RouteMatch { Path = "/api/auth/login", Methods = new[] { "POST", "OPTIONS" } }
             },
 
@@ -39,7 +42,7 @@ public static class ReverseProxyExtension
             new RouteConfig
             {
                 RouteId = "users-create",
-                ClusterId = "userServiceCluster",
+                ClusterId = UserServiceCluster,
                 Match = new RouteMatch { Path = "/api/users", Methods = new[] { "POST" } }
             },
 
@@ -47,7 +50,7 @@ public static class ReverseProxyExtension
             new RouteConfig
             {
                 RouteId = "users-list",
-                ClusterId = "userServiceCluster",
+                ClusterId = UserServiceCluster,
                 Match = new RouteMatch { Path = "/api/users", Methods = new[] { "GET" } },
                 AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
             },
@@ -56,7 +59,7 @@ public static class ReverseProxyExtension
             new RouteConfig
             {
                 RouteId = "users-get-by-id",
-                ClusterId = "userServiceCluster",
+                ClusterId = UserServiceCluster,
                 Match = new RouteMatch { Path = "/api/users/{id}", Methods = new[] { "GET" } },
                 AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
             },
@@ -65,7 +68,7 @@ public static class ReverseProxyExtension
             new RouteConfig
             {
                 RouteId = "users-by-email",
-                ClusterId = "userServiceCluster",
+                ClusterId = UserServiceCluster,
                 Match = new RouteMatch { Path = "/api/users/email/{email}", Methods = new[] { "GET" } },
                 AuthorizationPolicy = Policies.DATA_QUERY
             },
@@ -74,7 +77,7 @@ public static class ReverseProxyExtension
             new RouteConfig
             {
                 RouteId = "users-by-cpf",
-                ClusterId = "userServiceCluster",
+                ClusterId = UserServiceCluster,
                 Match = new RouteMatch { Path = "/api/users/cpf/{cpf}", Methods = new[] { "GET" } },
                 AuthorizationPolicy = Policies.DATA_QUERY
             },
@@ -83,7 +86,7 @@ public static class ReverseProxyExtension
             new RouteConfig
             {
                 RouteId = "users-update",
-                ClusterId = "userServiceCluster",
+                ClusterId = UserServiceCluster,
                 Match = new RouteMatch { Path = "/api/users/{id}", Methods = new[] { "PUT" } },
                 AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
             },
@@ -92,7 +95,7 @@ public static class ReverseProxyExtension
             new RouteConfig
             {
                 RouteId = "users-delete",
-                ClusterId = "userServiceCluster",
+                ClusterId = UserServiceCluster,
                 Match = new RouteMatch { Path = "/api/users/{id}", Methods = new[] { "DELETE" } },
                 AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
             }
@@ -105,7 +108,7 @@ public static class ReverseProxyExtension
         {
             new ClusterConfig
             {
-                ClusterId = "authCluster",
+                ClusterId = AuthCluster,
                 Destinations = new Dictionary<string, DestinationConfig>
                 {
                     { "authDestination", new DestinationConfig { Address = config.AuthLambda.Url } }
@@ -113,7 +116,7 @@ public static class ReverseProxyExtension
             },
             new ClusterConfig
             {
-                ClusterId = "userServiceCluster",
+                ClusterId = UserServiceCluster,
                 Destinations = new Dictionary<string, DestinationConfig>
                 {
                     { "userServiceDestination", new DestinationConfig { Address = config.UserService.Url } }
