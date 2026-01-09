@@ -10,6 +10,7 @@ public static class ReverseProxyExtension
     private const string AuthCluster = "authCluster";
     private const string PaymentServiceCluster = "paymentServiceCluster";
     private const string ProductServiceCluster = "productServiceCluster";
+    private const string OrderServiceCluster = "orderServiceCluster";
 
 
     public static IServiceCollection AddGatewayReverseProxy(this IServiceCollection services, IConfiguration configuration)
@@ -21,6 +22,7 @@ public static class ReverseProxyExtension
         servicesConfig.AuthLambda.Validate("AuthLambda");
         servicesConfig.PaymentService.Validate("PaymentService");
         servicesConfig.ProductService.Validate("ProductService");
+        servicesConfig.OrderService.Validate("OrderService");
 
         var routes = BuildRoutes();
         var clusters = BuildClusters(servicesConfig);
@@ -178,6 +180,150 @@ public static class ReverseProxyExtension
                 ClusterId = ProductServiceCluster,
                 Match = new RouteMatch { Path = "/api/products/{id}", Methods = new[] { "DELETE" } },
                 AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
+            },
+
+            // CATEGORIES - GetAll (público)
+            new RouteConfig
+            {
+                RouteId = "categories-list",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/categories", Methods = new[] { "GET" } }
+            },
+
+            // CATEGORIES - GetById (público)
+            new RouteConfig
+            {
+                RouteId = "categories-get-by-id",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/categories/{id}", Methods = new[] { "GET" } }
+            },
+
+            // CATEGORIES - Create (requer ADMIN_OR_MANAGER)
+            new RouteConfig
+            {
+                RouteId = "categories-create",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/categories", Methods = new[] { "POST" } },
+                AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
+            },
+
+            // CATEGORIES - Update (requer ADMIN_OR_MANAGER)
+            new RouteConfig
+            {
+                RouteId = "categories-update",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/categories/{id}", Methods = new[] { "PUT" } },
+                AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
+            },
+
+            // CATEGORIES - Delete (requer ADMIN_OR_MANAGER)
+            new RouteConfig
+            {
+                RouteId = "categories-delete",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/categories/{id}", Methods = new[] { "DELETE" } },
+                AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
+            },
+
+            // ITEMS - GetAll (público)
+            new RouteConfig
+            {
+                RouteId = "items-list",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/items", Methods = new[] { "GET" } }
+            },
+
+            // ITEMS - GetById (público)
+            new RouteConfig
+            {
+                RouteId = "items-get-by-id",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/items/{id}", Methods = new[] { "GET" } }
+            },
+
+            // ITEMS - Create (requer ADMIN_OR_MANAGER)
+            new RouteConfig
+            {
+                RouteId = "items-create",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/items", Methods = new[] { "POST" } },
+                AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
+            },
+
+            // ITEMS - Update (requer ADMIN_OR_MANAGER)
+            new RouteConfig
+            {
+                RouteId = "items-update",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/items/{id}", Methods = new[] { "PUT" } },
+                AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
+            },
+
+            // ITEMS - Delete (requer ADMIN_OR_MANAGER)
+            new RouteConfig
+            {
+                RouteId = "items-delete",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/items/{id}", Methods = new[] { "DELETE" } },
+                AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
+            },
+
+            // ORDERS - GetAll  
+            new RouteConfig
+            {
+                RouteId = "orders-list",
+                ClusterId = OrderServiceCluster,
+                Match = new RouteMatch { Path = "/api/orders", Methods = new[] { "GET" } },
+            },
+
+            // ORDERS - GetById 
+            new RouteConfig
+            {
+                RouteId = "orders-get-by-id",
+                ClusterId = OrderServiceCluster,
+                Match = new RouteMatch { Path = "/api/orders/{id}", Methods = new[] { "GET" } },
+            },
+
+            // ORDERS - Create público
+            new RouteConfig
+            {
+                RouteId = "orders-create",
+                ClusterId = OrderServiceCluster,
+                Match = new RouteMatch { Path = "/api/orders", Methods = new[] { "POST" } }
+            },
+
+            // ORDERS - Update (requer ADMIN_OR_MANAGER)
+            new RouteConfig
+            {
+                RouteId = "orders-update",
+                ClusterId = OrderServiceCluster,
+                Match = new RouteMatch { Path = "/api/orders/{id}", Methods = new[] { "PUT" } },
+                AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
+            },
+
+            // ORDERS - Delete (requer ADMIN_OR_MANAGER)
+            new RouteConfig
+            {
+                RouteId = "orders-delete",
+                ClusterId = OrderServiceCluster,
+                Match = new RouteMatch { Path = "/api/orders/{id}", Methods = new[] { "DELETE" } },
+                AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
+            },
+
+            // ORDERS - Ready Order
+            new RouteConfig
+            {
+                RouteId = "orders-ready",
+                ClusterId = OrderServiceCluster,
+                Match = new RouteMatch { Path = "/api/orders/{id}/ready", Methods = new[] { "GET" } },
+            },
+
+            // ORDERS - Confirm Payment 
+            new RouteConfig
+            {
+                RouteId = "orders-confirm-payment",
+                ClusterId = OrderServiceCluster,
+                Match = new RouteMatch { Path = "/api/orders/{id}/confirm-payment", Methods = new[] { "GET" } },
             }
         };
     }
@@ -217,6 +363,14 @@ public static class ReverseProxyExtension
                 Destinations = new Dictionary<string, DestinationConfig>
                 {
                     { "productServiceDestination", new DestinationConfig { Address = config.ProductService.Url } }
+                }
+            },
+            new ClusterConfig
+            {
+                ClusterId = OrderServiceCluster,
+                Destinations = new Dictionary<string, DestinationConfig>
+                {
+                    { "orderServiceDestination", new DestinationConfig { Address = config.OrderService.Url } }
                 }
             }
         };
