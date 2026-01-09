@@ -163,7 +163,7 @@ public class ReverseProxyExtensionTests
         var proxyConfig = proxyConfigProvider.GetConfig();
 
         proxyConfig.Clusters.Should().NotBeEmpty();
-        proxyConfig.Clusters.Should().HaveCount(3);
+        proxyConfig.Clusters.Should().HaveCount(4);
     }
 
     [Fact]
@@ -212,7 +212,8 @@ public class ReverseProxyExtensionTests
         {
             { "Services:UserService:Url", "http://localhost:8080" },
             { "Services:AuthLambda:Url", "https://lambda.aws.com" },
-            { "Services:PaymentService:Url", "http://localhost:9090" }
+            { "Services:PaymentService:Url", "http://localhost:9090" },
+            { "Services:ProductService:Url", "http://localhost:7070" }
         };
 
         return new ConfigurationBuilder()
