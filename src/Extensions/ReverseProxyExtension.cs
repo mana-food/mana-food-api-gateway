@@ -102,22 +102,20 @@ public static class ReverseProxyExtension
                 AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
             },
 
-            // PAGAMENTO - Create Payment (requer autenticação)
+            // PAGAMENTO - Create Payment (público - sem autenticação)
             new RouteConfig
             {
                 RouteId = "payment-create",
                 ClusterId = PaymentServiceCluster,
-                Match = new RouteMatch { Path = "/api/payment/create", Methods = new[] { "POST" } },
-                AuthorizationPolicy = "default"
+                Match = new RouteMatch { Path = "/api/payment/create", Methods = new[] { "POST" } }
             },
 
-            // PAGAMENTO - Get QR Code Image (requer autenticação)
+            // PAGAMENTO - Get QR Code Image (público - sem autenticação)
             new RouteConfig
             {
                 RouteId = "payment-qr-image",
                 ClusterId = PaymentServiceCluster,
-                Match = new RouteMatch { Path = "/api/payment/qr-image/{**catch-all}", Methods = new[] { "GET" } },
-                AuthorizationPolicy = "default"
+                Match = new RouteMatch { Path = "/api/payment/qr-image/{**catch-all}", Methods = new[] { "GET" } }
             },
 
             // PAGAMENTO - Webhook MercadoPago (público - sem autenticação)
