@@ -9,6 +9,8 @@ public static class ReverseProxyExtension
     private const string UserServiceCluster = "userServiceCluster";
     private const string AuthCluster = "authCluster";
     private const string PaymentServiceCluster = "paymentServiceCluster";
+    private const string ProductServiceCluster = "productServiceCluster";
+
 
     public static IServiceCollection AddGatewayReverseProxy(this IServiceCollection services, IConfiguration configuration)
     {
@@ -18,6 +20,7 @@ public static class ReverseProxyExtension
         servicesConfig.UserService.Validate("UserService");
         servicesConfig.AuthLambda.Validate("AuthLambda");
         servicesConfig.PaymentService.Validate("PaymentService");
+        servicesConfig.ProductService.Validate("ProductService");
 
         var routes = BuildRoutes();
         var clusters = BuildClusters(servicesConfig);
@@ -124,6 +127,57 @@ public static class ReverseProxyExtension
                 RouteId = "payment-webhook-mercadopago",
                 ClusterId = PaymentServiceCluster,
                 Match = new RouteMatch { Path = "/api/webhooks/mercadopago/{**catch-all}", Methods = new[] { "POST" } }
+            },
+
+            // PRODUTOS - GetAll (público)
+            new RouteConfig
+            {
+                RouteId = "products-list",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/products", Methods = new[] { "GET" } }
+            },
+
+            // PRODUTOS - GetById (público)
+            new RouteConfig
+            {
+                RouteId = "products-get-by-id",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/products/{id}", Methods = new[] { "GET" } }
+            },
+
+            // PRODUTOS - GetByCategory (público)
+            new RouteConfig
+            {
+                RouteId = "products-by-category",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/products/category/{category}", Methods = new[] { "GET" } }
+            },
+
+            // PRODUTOS - Create (requer ADMIN_OR_MANAGER)
+            new RouteConfig
+            {
+                RouteId = "products-create",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/products", Methods = new[] { "POST" } },
+                AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
+            },
+
+            // PRODUTOS - Update (requer ADMIN_OR_MANAGER)
+            new RouteConfig
+            {
+                RouteId = "products-update",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/products/{id}", Methods = new[] { "PUT" } },
+                AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
+            },
+
+            // PRODUTOS - Delete (requer ADMIN_OR_MANAGER)
+            new RouteConfig
+            {
+                RouteId = "products-delete",
+                ClusterId = ProductServiceCluster,
+                Match = new RouteMatch { Path = "/api/products/{id}", Methods = new[] { "DELETE" } },
+                AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
             }
         };
     }
@@ -154,6 +208,15 @@ public static class ReverseProxyExtension
                 Destinations = new Dictionary<string, DestinationConfig>
                 {
                     { "paymentServiceDestination", new DestinationConfig { Address = config.PaymentService.Url } }
+                }
+            },
+
+            new ClusterConfig
+            {
+                ClusterId = ProductServiceCluster,
+                Destinations = new Dictionary<string, DestinationConfig>
+                {
+                    { "productServiceDestination", new DestinationConfig { Address = config.ProductService.Url } }
                 }
             }
         };
