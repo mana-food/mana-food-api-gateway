@@ -9,6 +9,7 @@ builder.Configuration.AddInMemoryCollection(new Dictionary<string, string?>
     ["Jwt:Issuer"] = Environment.GetEnvironmentVariable("JWT_ISSUER") ?? builder.Configuration["Jwt:Issuer"],
     ["Jwt:Audience"] = Environment.GetEnvironmentVariable("JWT_AUDIENCE") ?? builder.Configuration["Jwt:Audience"],
     ["Services:UserService:Url"] = Environment.GetEnvironmentVariable("USER_SERVICE_URL") ?? builder.Configuration["Services:UserService:Url"],
+    ["Services:PaymentService:Url"] = Environment.GetEnvironmentVariable("PAYMENT_SERVICE_URL") ?? builder.Configuration["Services:PaymentService:Url"],
     ["Services:AuthLambda:Url"] = Environment.GetEnvironmentVariable("AUTH_LAMBDA_URL") ?? builder.Configuration["Services:AuthLambda:Url"]
 });
 
