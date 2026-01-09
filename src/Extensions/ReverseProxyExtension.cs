@@ -8,6 +8,7 @@ public static class ReverseProxyExtension
 {
     private const string UserServiceCluster = "userServiceCluster";
     private const string AuthCluster = "authCluster";
+    private const string PaymentServiceCluster = "paymentServiceCluster";
 
     public static IServiceCollection AddGatewayReverseProxy(this IServiceCollection services, IConfiguration configuration)
     {
@@ -16,6 +17,7 @@ public static class ReverseProxyExtension
 
         servicesConfig.UserService.Validate("UserService");
         servicesConfig.AuthLambda.Validate("AuthLambda");
+        servicesConfig.PaymentService.Validate("PaymentService");
 
         var routes = BuildRoutes();
         var clusters = BuildClusters(servicesConfig);
@@ -98,6 +100,32 @@ public static class ReverseProxyExtension
                 ClusterId = UserServiceCluster,
                 Match = new RouteMatch { Path = "/api/users/{id}", Methods = new[] { "DELETE" } },
                 AuthorizationPolicy = Policies.ADMIN_OR_MANAGER
+            },
+
+            // PAGAMENTO - Create Payment (requer autenticação)
+            new RouteConfig
+            {
+                RouteId = "payment-create",
+                ClusterId = PaymentServiceCluster,
+                Match = new RouteMatch { Path = "/api/payment/create", Methods = new[] { "POST" } },
+                AuthorizationPolicy = "default"
+            },
+
+            // PAGAMENTO - Get QR Code Image (requer autenticação)
+            new RouteConfig
+            {
+                RouteId = "payment-qr-image",
+                ClusterId = PaymentServiceCluster,
+                Match = new RouteMatch { Path = "/api/payment/qr-image/{**catch-all}", Methods = new[] { "GET" } },
+                AuthorizationPolicy = "default"
+            },
+
+            // PAGAMENTO - Webhook MercadoPago (público - sem autenticação)
+            new RouteConfig
+            {
+                RouteId = "payment-webhook-mercadopago",
+                ClusterId = PaymentServiceCluster,
+                Match = new RouteMatch { Path = "/api/webhooks/mercadopago/{**catch-all}", Methods = new[] { "POST" } }
             }
         };
     }
@@ -120,6 +148,14 @@ public static class ReverseProxyExtension
                 Destinations = new Dictionary<string, DestinationConfig>
                 {
                     { "userServiceDestination", new DestinationConfig { Address = config.UserService.Url } }
+                }
+            },
+            new ClusterConfig
+            {
+                ClusterId = PaymentServiceCluster,
+                Destinations = new Dictionary<string, DestinationConfig>
+                {
+                    { "paymentServiceDestination", new DestinationConfig { Address = config.PaymentService.Url } }
                 }
             }
         };

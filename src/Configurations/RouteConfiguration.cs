@@ -4,6 +4,7 @@ public class ServicesConfiguration
 {
     public ServiceEndpoint UserService { get; set; } = new();
     public ServiceEndpoint AuthLambda { get; set; } = new();
+    public ServiceEndpoint PaymentService { get; set; } = new();
 }
 
 public class ServiceEndpoint
