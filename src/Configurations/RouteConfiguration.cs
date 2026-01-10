@@ -6,6 +6,7 @@ public class ServicesConfiguration
     public ServiceEndpoint AuthLambda { get; set; } = new();
     public ServiceEndpoint PaymentService { get; set; } = new();
     public ServiceEndpoint ProductService { get; set; } = new();    
+    public ServiceEndpoint OrderService { get; set; } = new();    
 }
 
 public class ServiceEndpoint
