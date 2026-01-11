@@ -63,9 +63,9 @@ public static class ReverseProxyExtension
         routes.AddRange(CreateCrudRoutes("items", ProductServiceCluster, "/api/items", publicRead: true));
 
         // ORDERS
-        routes.Add(CreateRoute("orders-list", OrderServiceCluster, "/api/orders", new[] { "GET" }));
-        routes.Add(CreateRoute("orders-get-by-id", OrderServiceCluster, "/api/orders/{id}", new[] { "GET" }));
-        routes.Add(CreateRoute("orders-create", OrderServiceCluster, "/api/orders", new[] { "POST" }));
+        routes.Add(CreateRoute("orders-list", OrderServiceCluster, "/api/orders", new[] { "GET" }, Policies.DATA_QUERY));
+        routes.Add(CreateRoute("orders-get-by-id", OrderServiceCluster, "/api/orders/{id}", new[] { "GET" }, Policies.DATA_QUERY));
+        routes.Add(CreateRoute("orders-create", OrderServiceCluster, "/api/orders", new[] { "POST" }, Policies.ADMIN_OR_MANAGER));
         routes.Add(CreateRoute("orders-update", OrderServiceCluster, "/api/orders/{id}", new[] { "PUT" }, Policies.ADMIN_OR_MANAGER));
         routes.Add(CreateRoute("orders-delete", OrderServiceCluster, "/api/orders/{id}", new[] { "DELETE" }, Policies.ADMIN_OR_MANAGER));
         routes.Add(CreateRoute("orders-ready", OrderServiceCluster, "/api/orders/{id}/ready", new[] { "GET" }));
